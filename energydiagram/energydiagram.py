@@ -37,6 +37,7 @@ class ED:
         self.bottom_texts = []
         self.left_texts = []
         self.right_texts = []
+        self.labels = []
         self.links = []
         self.arrows = []
         self.electons_boxes = []
@@ -45,7 +46,7 @@ class ED:
         self.ax = None
 
     def add_level(self, energy, bottom_text='', position=None, color='k',
-                  top_text='Energy', right_text='', left_text=''):
+                  top_text='Energy', right_text='', left_text='', label=None):
         '''
         Method of ED class
         This method add a new energy level to the plot.
@@ -74,6 +75,9 @@ class ED:
         top_text  : str
                 Text on the top of the level. By default it will print the
                 energy of the level. (default  'Energy')
+        label : str
+                If specified, this line will show up in any legend added to
+                the plot with `label` as the text in the legend.
 
 
 
@@ -105,6 +109,7 @@ class ED:
         self.right_texts.append(right_text)
         self.links.append(link)
         self.arrows.append([])
+        self.labels.append(label)
 
     def add_arrow(self, start_level_id, end_level_id):
         '''
@@ -240,11 +245,12 @@ class ED:
                         self.top_texts,  # 3
                         self.colors,  # 4
                         self.right_texts,  # 5
-                        self.left_texts,))  # 6
+                        self.left_texts, #6
+                        self.labels))  # 7
 
         for level in data:
             start = level[1]*(self.dimension+self.space)
-            ax.hlines(level[0], start, start + self.dimension, color=level[4])
+            ax.hlines(level[0], start, start + self.dimension, color=level[4], label=level[7])
             ax.text(start+self.dimension/2.,  # X
                     level[0]+self.offset,  # Y
                     level[3],  # self.top_texts
