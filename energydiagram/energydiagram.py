@@ -42,6 +42,7 @@ class ED:
         self.links = []
         self.arrows = []
         self.electons_boxes = []
+        self.shade_bg = []
         # matplotlib fiugre handlers
         self.fig = None
         self.ax = None
@@ -57,6 +58,7 @@ class ED:
         left_text="",
         label=None,
         energyfmt: str = ".2f",
+        shade_bg: bool = False,
         **kwargs,
     ):
         """
@@ -94,6 +96,10 @@ class ED:
                 If energies are plotted as the top text (i.e., top_text =
                 "Energy"), then this format string controls how the energy
                 float values are formatted. (default ".2f")
+        shade_bg : bool, optional
+                If True, will draw white boxes of alpha 0.5 behind the top and
+                bottom text so that the lines don't make it hard to read the
+                text.
         **kwargs : **dict
                 Other arguments to pass to `plt.Axes.axhlines`.
 
@@ -131,6 +137,7 @@ class ED:
         self.arrows.append([])
         self.labels.append(label)
         self.kwargs.append(kwargs)
+        self.shade_bg.append(shade_bg)
 
     def add_arrow(self, start_level_id, end_level_id):
         """
@@ -272,19 +279,34 @@ class ED:
                 self.right_texts,  # 5
                 self.left_texts,  # 6
                 self.labels,  # 7
-                self.kwargs,
+                self.shade_bg,  # 8
+                self.kwargs,  # 9
             )
         )  # 8
 
         for level in data:
             start = level[1] * (self.dimension + self.space)
+
+            # Determine whether to draw a white shading box
+
+            bbox_params = (
+                {
+                    "facecolor": "w",
+                    "edgecolor": "w",
+                    "linewidth": None,
+                    "alpha": 0.5,
+                }
+                if level[8]
+                else None
+            )
+
             ax.hlines(
                 level[0],
                 start,
                 start + self.dimension,
                 color=level[4],
                 label=level[7],
-                **level[8],
+                **level[9],
             )
             ax.text(
                 start + self.dimension / 2.0,  # X
@@ -292,6 +314,7 @@ class ED:
                 level[3],  # self.top_texts
                 horizontalalignment="center",
                 verticalalignment="bottom",
+                bbox=bbox_params,
             )
 
             ax.text(
@@ -318,6 +341,7 @@ class ED:
                 level[2],  # self.bottom_text
                 horizontalalignment="center",
                 verticalalignment="top",
+                bbox=bbox_params,
                 color=self.color_bottom_text,
             )
         if show_IDs:
